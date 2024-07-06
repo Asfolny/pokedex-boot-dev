@@ -6,16 +6,15 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/Asfolny/pokedex-boot-dev/internal/pokecache"
 )
 
 func main() {
 	stdin := bufio.NewReader(os.Stdin)
-	state := state{
-		mapStore: pokeMapStore{
-			currentPageId: 1,
-			pokeMaps:      make(map[int]pokeMap),
-		},
-	}
+	startIdx := 1
+	state := state{pokecache.New(5 * time.Minute), &startIdx}
 	for {
 		fmt.Print("Pokedex > ")
 		cmd, err := stdin.ReadString('\n')
@@ -24,12 +23,12 @@ func main() {
 		}
 		cmd = strings.ReplaceAll(cmd, "\n", "")
 
-		cliDef, ok := getCommands(state)[cmd]
+		cliDef, ok := getCommands()[cmd]
 		if !ok {
-			cliDef = getCommands(state)["help"]
+			cliDef = getCommands()["help"]
 		}
 
-		err = cliDef.callback()
+		err = cliDef.callback(state)
 		if err != nil {
 			fmt.Printf("%v\n", err.Error())
 		}
@@ -39,10 +38,10 @@ func main() {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(state) error
 }
 
-func getCommands(s state) map[string]cliCommand {
+func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
@@ -57,19 +56,19 @@ func getCommands(s state) map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "Display the next 20 maps",
-			callback:    s.mapStore.mapCommand,
+			callback:    mapCommand,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Display the next 20 maps",
-			callback:    s.mapStore.mapBackCommand,
+			callback:    mapBackCommand,
 		},
 	}
 }
 
-func commandHelp() error {
-	fmt.Println("Usage:\n")
-	for _, cliCmd := range getCommands(state{}) {
+func commandHelp(state state) error {
+	fmt.Print("Usage:\n\n")
+	for _, cliCmd := range getCommands() {
 		fmt.Printf("%s: %s\n", cliCmd.name, cliCmd.description)
 	}
 	fmt.Println()
@@ -77,11 +76,12 @@ func commandHelp() error {
 	return nil
 }
 
-func commandExit() error {
+func commandExit(state state) error {
 	os.Exit(0)
 	return nil
 }
 
 type state struct {
-	mapStore pokeMapStore
+	cache           *pokecache.Cache
+	mapCurrentIndex *int
 }
