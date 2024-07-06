@@ -69,8 +69,9 @@ func getMap(state state, index int) pokeMap {
 	return item
 }
 
-func exploreCommand(state state, explore string) error {
-	curMap := getMapByName(state, explore)
+func exploreCommand(state state) error {
+	location := state.cmdParts[1]
+	curMap := getMapByName(state, location)
 	for _, poke := range curMap.PokemonEncounters {
 		fmt.Printf(" - %v\n", poke.Name)
 	}

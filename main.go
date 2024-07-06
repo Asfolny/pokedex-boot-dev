@@ -22,6 +22,8 @@ func main() {
 			log.Fatalln("Input parsing broken")
 		}
 		cmd = strings.ReplaceAll(cmd, "\n", "")
+		cmdParts := strings.Split(cmd, " ")
+		cmd = cmdParts[0]
 
 		cliDef, ok := getCommands()[cmd]
 		if !ok {
@@ -63,6 +65,11 @@ func getCommands() map[string]cliCommand {
 			description: "Display the next 20 maps",
 			callback:    mapBackCommand,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explore a map",
+			callback:    exploreCommand,
+		},
 	}
 }
 
@@ -84,4 +91,5 @@ func commandExit(state state) error {
 type state struct {
 	cache           *pokecache.Cache
 	mapCurrentIndex *int
+	cmdParts        []string
 }
