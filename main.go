@@ -81,6 +81,11 @@ func getCommands() map[string]cliCommand {
 			description: "Inspect a caught pokemon",
 			callback:    inspectCommand,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "List out your pokedex",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -96,6 +101,20 @@ func commandHelp(state state) error {
 
 func commandExit(state state) error {
 	os.Exit(0)
+	return nil
+}
+
+func commandPokedex(state state) error {
+	if len(state.pokedex) < 1 {
+		fmt.Println("Pokedex is empty")
+		return nil
+	}
+
+	fmt.Println("Your pokedex:")
+	for _, poke := range state.pokedex {
+		fmt.Printf("    - %v\n", poke.Name)
+	}
+
 	return nil
 }
 
