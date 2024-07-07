@@ -14,7 +14,8 @@ import (
 func main() {
 	stdin := bufio.NewReader(os.Stdin)
 	startIdx := 1
-	state := state{pokecache.New(5 * time.Minute), &startIdx, nil}
+	pokedex := make(map[string]pokemon)
+	state := state{pokecache.New(5 * time.Minute), &startIdx, nil, pokedex}
 	for {
 		fmt.Print("Pokedex > ")
 		cmd, err := stdin.ReadString('\n')
@@ -70,6 +71,16 @@ func getCommands() map[string]cliCommand {
 			description: "Explore a map",
 			callback:    exploreCommand,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Try to catch a pokemon",
+			callback:    catchCommand,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a caught pokemon",
+			callback:    inspectCommand,
+		},
 	}
 }
 
@@ -92,4 +103,5 @@ type state struct {
 	cache           *pokecache.Cache
 	mapCurrentIndex *int
 	cmdParts        []string
+	pokedex         map[string]pokemon
 }
