@@ -44,7 +44,7 @@ func getMap(state state, index int) pokeMap {
 			log.Fatalln(err)
 		}
 
-		newPokeMap := pokeMap{index, "Not Found"}
+		newPokeMap := pokeMap{index, "Not Found", nil}
 		if res.StatusCode == 200 {
 			decoder := json.NewDecoder(res.Body)
 			if err := decoder.Decode(&newPokeMap); err != nil {
@@ -71,9 +71,11 @@ func getMap(state state, index int) pokeMap {
 
 func exploreCommand(state state) error {
 	location := state.cmdParts[1]
+	fmt.Printf("Exploring %v...\n", location)
 	curMap := getMapByName(state, location)
-	for _, poke := range curMap.PokemonEncounters {
-		fmt.Printf(" - %v\n", poke.Name)
+	fmt.Println("Found Pokemon:")
+	for i, pokeEncounter := range curMap.PokemonEncounters {
+		fmt.Printf("%v - %v\n", i, pokeEncounter.Pokemon.Name)
 	}
 	return nil
 }
@@ -113,9 +115,13 @@ func getMapByName(state state, name string) pokeMap {
 }
 
 type pokeMap struct {
-	Id                int       `json:"id"`
-	Name              string    `json:"name"`
-	PokemonEncounters []pokemon `json:"pokemon_encounters"`
+	Id                int                `json:"id"`
+	Name              string             `json:"name"`
+	PokemonEncounters []pokemonEncounter `json:"pokemon_encounters"`
+}
+
+type pokemonEncounter struct {
+	Pokemon pokemon `json:"pokemon"`
 }
 
 type pokemon struct {

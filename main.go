@@ -14,7 +14,7 @@ import (
 func main() {
 	stdin := bufio.NewReader(os.Stdin)
 	startIdx := 1
-	state := state{pokecache.New(5 * time.Minute), &startIdx}
+	state := state{pokecache.New(5 * time.Minute), &startIdx, nil}
 	for {
 		fmt.Print("Pokedex > ")
 		cmd, err := stdin.ReadString('\n')
@@ -22,8 +22,8 @@ func main() {
 			log.Fatalln("Input parsing broken")
 		}
 		cmd = strings.ReplaceAll(cmd, "\n", "")
-		cmdParts := strings.Split(cmd, " ")
-		cmd = cmdParts[0]
+		state.cmdParts = strings.Split(cmd, " ")
+		cmd = state.cmdParts[0]
 
 		cliDef, ok := getCommands()[cmd]
 		if !ok {
