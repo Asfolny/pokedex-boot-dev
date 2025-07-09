@@ -23,7 +23,7 @@ func main() {
 			log.Fatalln("Input parsing broken")
 		}
 		cmd = strings.ReplaceAll(cmd, "\n", "")
-		state.cmdParts = strings.Split(cmd, " ")
+		state.cmdParts = cleanInput(cmd)
 		cmd = state.cmdParts[0]
 
 		cliDef, ok := getCommands()[cmd]
@@ -36,6 +36,12 @@ func main() {
 			fmt.Printf("%v\n", err.Error())
 		}
 	}
+}
+
+func cleanInput(text string) []string {
+	output := strings.ToLower(text)
+	words := strings.Fields(output)
+	return words
 }
 
 type cliCommand struct {
