@@ -16,7 +16,10 @@ func main() {
 	startIdx := 1
 	pokedex := make(map[string]pokemon)
 	state := state{pokecache.New(5 * time.Minute), &startIdx, nil, pokedex}
+	fmt.Print("Welcome to the Pokedex!")
+
 	for {
+		
 		fmt.Print("Pokedex > ")
 		cmd, err := stdin.ReadString('\n')
 		if err != nil {
@@ -106,6 +109,7 @@ func commandHelp(state state) error {
 }
 
 func commandExit(state state) error {
+	fmt.Print("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
